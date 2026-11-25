@@ -7,7 +7,11 @@ $current = '/' . trim(substr(rawurldecode(parse_url($_SERVER['REQUEST_URI'] ?? '
 $isActive = fn(string $p) => ($p === '/' ? $current === '/' : str_starts_with($current, $p)) ? 'active' : '';
 $cats = nav_categories();
 $phone = setting('phone');
-$socials = array_filter(['facebook' => setting('facebook'), 'instagram' => setting('instagram'), 'tiktok' => setting('tiktok'), 'youtube' => setting('youtube')]);
+$me = customer();
+$wishCount = count(wishlist_ids());
+$loc = delivery_location();
+$navPosts = rows('SELECT title, slug FROM posts WHERE is_published = 1 ORDER BY created_at DESC LIMIT 4');
+$socials = array_filter(['facebook' => setting('facebook'), 'instagram' => setting('instagram'), 'telegram' => setting('telegram'), 'tiktok' => setting('tiktok'), 'youtube' => setting('youtube')]);
 ?>
 <!doctype html>
 <html lang="ar" dir="rtl">
@@ -23,87 +27,82 @@ $socials = array_filter(['facebook' => setting('facebook'), 'instagram' => setti
     <link rel="icon" type="image/png" href="<?= asset('assets/img/favicon.png') ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('assets/css/site.css') ?>">
 </head>
 <body>
-
-<?php if ($ann = setting('announcement')): ?>
-<div class="announce"><div class="container"><?= icon('drop', 16) ?> <span><?= e($ann) ?></span></div></div>
-<?php endif; ?>
-
-<div class="topbar">
-    <div class="container topbar-inner">
-        <div class="topbar-info">
-            <?php if ($phone): ?><a href="<?= e(tel_link($phone)) ?>"><?= icon('phone', 15) ?> <span dir="ltr"><?= e($phone) ?></span></a><?php endif; ?>
-            <?php if ($em = setting('email')): ?><a href="mailto:<?= e($em) ?>" class="hide-sm"><?= icon('mail', 15) ?> <?= e($em) ?></a><?php endif; ?>
-            <?php if ($wh = setting('working_hours')): ?><span class="hide-md"><?= icon('clock', 15) ?> <?= e($wh) ?></span><?php endif; ?>
-        </div>
-        <div class="topbar-links">
-            <a href="<?= url('/track') ?>"><?= icon('truck', 15) ?> تتبع طلبك</a>
-            <span class="socials">
-                <?php foreach ($socials as $net => $link): ?>
-                    <a href="<?= e($link) ?>" target="_blank" rel="noopener" aria-label="<?= e($net) ?>"><?= icon($net, 15) ?></a>
-                <?php endforeach; ?>
-            </span>
-        </div>
-    </div>
-</div>
 
 <header class="header" id="header">
     <div class="container header-inner">
         <button class="icon-btn menu-toggle" data-open-drawer aria-label="القائمة"><?= icon('menu', 24) ?></button>
 
         <a href="<?= url('/') ?>" class="brand" aria-label="<?= e($siteName) ?>">
-            <img src="<?= asset('assets/img/logo-mark.png') ?>" alt="" width="42" height="64">
-            <span class="brand-text">
-                <strong><?= e($siteName) ?></strong>
-                <small><?= e($tagline) ?></small>
-            </span>
+            <img src="<?= asset('assets/img/logo-mark.png') ?>" alt="" width="36" height="55">
+            <span class="brand-text"><strong><?= e($siteName) ?></strong><small><?= e($tagline) ?></small></span>
         </a>
 
+        <button class="location-btn" data-open-modal="location-modal" type="button">
+            <?= icon('pin', 22) ?>
+            <span><small>التوصيل إلى</small><b data-location-label><?= $loc ? e($loc) : 'اختر موقعك' ?></b></span>
+        </button>
+
         <form class="search" action="<?= url('/search') ?>" method="get" role="search">
-            <input type="search" name="q" value="<?= e($_GET['q'] ?? '') ?>" placeholder="دوّر على فلتر، شمعة، قطعة غيار..." aria-label="بحث">
-            <button type="submit" aria-label="بحث"><?= icon('search', 20) ?></button>
+            <input type="search" name="q" value="<?= e($_GET['q'] ?? '') ?>" placeholder="ابحث عن فلتر 7 مراحل..." aria-label="بحث">
+            <button type="submit" aria-label="بحث"><?= icon('search', 18) ?></button>
         </form>
 
-        <div class="header-actions">
-            <a href="<?= e(wa_link('السلام عليكم، عايز أستفسر عن الفلاتر')) ?>" class="hdr-wa hide-md" target="_blank" rel="noopener">
-                <?= icon('whatsapp', 22) ?>
-                <span><small>اطلب على واتساب</small><b dir="ltr"><?= e($phone) ?></b></span>
+        <nav class="header-icons" aria-label="حسابي">
+            <a href="<?= url($me ? '/account' : '/account/login') ?>" class="hicon hide-md" title="<?= $me ? 'حسابي' : 'تسجيل الدخول' ?>" aria-label="حسابي">
+                <?= icon($me ? 'user' : 'user-plus', 24) ?>
             </a>
-            <a href="<?= url('/cart') ?>" class="icon-btn cart-btn" aria-label="السلة">
-                <?= icon('cart', 24) ?>
-                <span class="cart-count" data-cart-count <?= cart_count() ? '' : 'hidden' ?>><?= cart_count() ?></span>
+            <a href="<?= url('/wishlist') ?>" class="hicon" title="المفضلة" aria-label="المفضلة">
+                <?= icon('heart', 24, 'filled') ?>
+                <span class="hcount" data-wish-count <?= $wishCount ? '' : 'hidden' ?>><?= $wishCount ?></span>
             </a>
-        </div>
+            <a href="<?= url('/cart') ?>" class="hicon" title="عربة التسوق" aria-label="عربة التسوق">
+                <?= icon('cart', 24, 'filled') ?>
+                <span class="hcount" data-cart-count <?= cart_count() ? '' : 'hidden' ?>><?= cart_count() ?></span>
+            </a>
+        </nav>
     </div>
 
-    <nav class="nav">
-        <div class="container">
-            <ul class="nav-list">
-                <li><a href="<?= url('/') ?>" class="<?= $isActive('/') ?>">الرئيسية</a></li>
-                <li class="has-drop">
-                    <a href="<?= url('/shop') ?>" class="<?= $isActive('/shop') ?: $isActive('/category') ?>">المنتجات <?= icon('chevron-d', 16) ?></a>
-                    <div class="dropdown">
-                        <?php foreach ($cats as $c): ?>
-                            <a href="<?= url('/category/' . $c['slug']) ?>">
-                                <img src="<?= e(img($c['image'])) ?>" alt="" loading="lazy">
-                                <span><?= e($c['name']) ?><small><?= (int)$c['products_count'] ?> منتج</small></span>
+    <nav class="nav" aria-label="القائمة الرئيسية">
+        <ul class="container nav-list">
+            <li class="has-drop has-mega">
+                <a href="<?= url('/shop') ?>" class="<?= $isActive('/shop') ?: $isActive('/category') ?>">كل المنتجات <?= icon('chevron-d', 14) ?></a>
+                <div class="dropdown mega">
+                    <?php foreach ($cats as $c): if ($c['slug'] === 'offers') continue; ?>
+                        <div class="mega-col">
+                            <a href="<?= url('/category/' . $c['slug']) ?>" class="mega-head">
+                                <img src="<?= e(img($c['image'])) ?>" alt="" loading="lazy"><span><?= e($c['name']) ?></span>
                             </a>
-                        <?php endforeach; ?>
-                        <a href="<?= url('/shop') ?>" class="drop-all">كل المنتجات <?= icon('chevron-l', 16) ?></a>
-                    </div>
-                </li>
-                <?php foreach (array_slice($cats, 0, 3) as $c): ?>
-                    <li class="hide-lg"><a href="<?= url('/category/' . $c['slug']) ?>" class="<?= $isActive('/category/' . $c['slug']) ?>"><?= e($c['name']) ?></a></li>
-                <?php endforeach; ?>
-                <li><a href="<?= url('/offers') ?>" class="<?= $isActive('/offers') ?> nav-hot">العروض</a></li>
-                <li><a href="<?= url('/maintenance') ?>" class="<?= $isActive('/maintenance') ?>">طلب صيانة</a></li>
-                <li><a href="<?= url('/about') ?>" class="<?= $isActive('/about') ?>">من نحن</a></li>
-                <li><a href="<?= url('/contact') ?>" class="<?= $isActive('/contact') ?>">تواصل معنا</a></li>
-            </ul>
-        </div>
+                            <?php foreach ($c['children'] as $ch): ?><a href="<?= url('/category/' . $ch['slug']) ?>" class="mega-link"><?= e($ch['name']) ?></a><?php endforeach; ?>
+                        </div>
+                    <?php endforeach; ?>
+                    <a href="<?= url('/shop') ?>" class="mega-all">تصفح كل المنتجات <?= icon('chevron-l', 16) ?></a>
+                </div>
+            </li>
+            <li class="has-drop">
+                <a href="<?= url('/offers') ?>" class="<?= $isActive('/offers') ?>">تخفيضات <?= icon('chevron-d', 14) ?></a>
+                <div class="dropdown">
+                    <a href="<?= url('/offers') ?>">كل التخفيضات</a>
+                    <?php foreach ($cats as $c): if ($c['slug'] === 'offers') continue; ?>
+                        <a href="<?= url('/offers?cat[]=' . urlencode($c['slug'])) ?>">عروض <?= e($c['name']) ?></a>
+                    <?php endforeach; ?>
+                </div>
+            </li>
+            <li><a href="<?= url('/services') ?>" class="<?= $isActive('/services') ?>">خدماتنا</a></li>
+            <li><a href="<?= url('/service-request') ?>" class="<?= $isActive('/service-request') ?>">طلب خدمة</a></li>
+            <li class="has-drop">
+                <a href="<?= url('/blog') ?>" class="<?= $isActive('/blog') ?>">المدونة <?= icon('chevron-d', 14) ?></a>
+                <div class="dropdown">
+                    <?php foreach ($navPosts as $np): ?><a href="<?= url('/blog/' . $np['slug']) ?>"><?= e($np['title']) ?></a><?php endforeach; ?>
+                    <a href="<?= url('/blog') ?>" class="drop-all">كل المقالات</a>
+                </div>
+            </li>
+            <li><a href="<?= url('/contact') ?>" class="<?= $isActive('/contact') ?>">اتصل بنا</a></li>
+            <li><a href="<?= url('/installments') ?>" class="<?= $isActive('/installments') ?>">التقسيط</a></li>
+        </ul>
     </nav>
 </header>
 
@@ -113,37 +112,39 @@ $socials = array_filter(['facebook' => setting('facebook'), 'instagram' => setti
     <aside class="drawer-panel">
         <div class="drawer-head">
             <a href="<?= url('/') ?>" class="brand">
-                <img src="<?= asset('assets/img/logo-mark.png') ?>" alt="" width="34" height="52">
+                <img src="<?= asset('assets/img/logo-mark.png') ?>" alt="" width="30" height="46">
                 <span class="brand-text"><strong><?= e($siteName) ?></strong><small><?= e($tagline) ?></small></span>
             </a>
             <button class="icon-btn" data-close-drawer aria-label="إغلاق"><?= icon('x', 22) ?></button>
         </div>
-        <form class="search search-drawer" action="<?= url('/search') ?>" method="get">
-            <input type="search" name="q" placeholder="ابحث عن منتج..." aria-label="بحث">
-            <button type="submit" aria-label="بحث"><?= icon('search', 18) ?></button>
-        </form>
+        <button class="drawer-loc" data-open-modal="location-modal" type="button"><?= icon('pin', 18) ?> التوصيل إلى: <b data-location-label><?= $loc ? e($loc) : 'اختر موقعك' ?></b></button>
         <nav class="drawer-nav">
             <a href="<?= url('/') ?>"><?= icon('home', 18) ?> الرئيسية</a>
-            <a href="<?= url('/shop') ?>"><?= icon('grid', 18) ?> كل المنتجات</a>
-            <div class="drawer-cats">
-                <?php foreach ($cats as $c): ?><a href="<?= url('/category/' . $c['slug']) ?>"><?= e($c['name']) ?></a><?php endforeach; ?>
-            </div>
-            <a href="<?= url('/offers') ?>"><?= icon('tag', 18) ?> العروض</a>
-            <a href="<?= url('/maintenance') ?>"><?= icon('tool', 18) ?> طلب صيانة / تركيب</a>
+            <details>
+                <summary><?= icon('grid', 18) ?> كل المنتجات <?= icon('chevron-d', 16) ?></summary>
+                <div class="drawer-cats">
+                    <a href="<?= url('/shop') ?>">كل المنتجات</a>
+                    <?php foreach ($cats as $c): if ($c['slug'] === 'offers') continue; ?>
+                        <a href="<?= url('/category/' . $c['slug']) ?>"><?= e($c['name']) ?></a>
+                        <?php foreach ($c['children'] as $ch): ?><a href="<?= url('/category/' . $ch['slug']) ?>" class="sub">— <?= e($ch['name']) ?></a><?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
+            </details>
+            <a href="<?= url('/offers') ?>"><?= icon('tag', 18) ?> تخفيضات</a>
+            <a href="<?= url('/services') ?>"><?= icon('award', 18) ?> خدماتنا</a>
+            <a href="<?= url('/service-request') ?>"><?= icon('tool', 18) ?> طلب خدمة</a>
+            <a href="<?= url('/installments') ?>"><?= icon('cash', 18) ?> التقسيط</a>
+            <a href="<?= url('/blog') ?>"><?= icon('book', 18) ?> المدونة</a>
             <a href="<?= url('/track') ?>"><?= icon('truck', 18) ?> تتبع طلبك</a>
-            <a href="<?= url('/about') ?>"><?= icon('drop', 18) ?> من نحن</a>
-            <a href="<?= url('/faq') ?>"><?= icon('help', 18) ?> الأسئلة الشائعة</a>
-            <a href="<?= url('/contact') ?>"><?= icon('message', 18) ?> تواصل معنا</a>
+            <a href="<?= url('/contact') ?>"><?= icon('phone', 18) ?> اتصل بنا</a>
+            <a href="<?= url($me ? '/account' : '/account/login') ?>"><?= icon('user', 18) ?> <?= $me ? 'حسابي' : 'تسجيل الدخول / حساب جديد' ?></a>
         </nav>
-        <div class="drawer-foot">
-            <a href="<?= e(tel_link($phone)) ?>" class="btn btn-outline btn-block"><?= icon('phone', 18) ?> <span dir="ltr"><?= e($phone) ?></span></a>
-        </div>
     </aside>
 </div>
 
 <main id="main">
     <?php if ($m = flash('success')): ?>
-        <div class="container"><div class="alert alert-success"><?= icon('check', 18) ?> <?= e($m) ?></div></div>
+        <div class="container"><div class="alert alert-success" data-autohide><?= icon('check', 18) ?> <?= e($m) ?></div></div>
     <?php endif; ?>
     <?php if ($m = flash('error')): ?>
         <div class="container"><div class="alert alert-error"><?= icon('x', 18) ?> <?= e($m) ?></div></div>
@@ -152,75 +153,152 @@ $socials = array_filter(['facebook' => setting('facebook'), 'instagram' => setti
     <?= $content ?>
 </main>
 
-<section class="features-strip">
-    <div class="container features-grid">
-        <div class="feature"><span class="f-ico"><?= icon('truck', 26) ?></span><div><b>توصيل لكل المحافظات</b><small>شحن مجاني فوق <?= money(setting('free_shipping_min', 0)) ?></small></div></div>
-        <div class="feature"><span class="f-ico"><?= icon('tool', 26) ?></span><div><b>تركيب مجاني</b><small>بأيدي فنيين متخصصين</small></div></div>
-        <div class="feature"><span class="f-ico"><?= icon('shield', 26) ?></span><div><b>ضمان حقيقي</b><small>وقطع غيار أصلية</small></div></div>
-        <div class="feature"><span class="f-ico"><?= icon('cash', 26) ?></span><div><b>الدفع عند الاستلام</b><small>أو فودافون كاش / إنستاباي</small></div></div>
-    </div>
-</section>
-
 <footer class="footer">
-    <div class="footer-wave" aria-hidden="true">
-        <svg viewBox="0 0 1440 80" preserveAspectRatio="none"><path d="M0 40c120 26 240 40 360 26S600 10 720 14s240 40 360 44 240-18 360-34v56H0z"/></svg>
-    </div>
-    <div class="container footer-grid">
-        <div class="footer-about">
-            <a href="<?= url('/') ?>" class="footer-logo"><img src="<?= asset('assets/img/logo-white.png') ?>" alt="<?= e($siteName) ?>" width="120" height="157" loading="lazy"></a>
-            <p><?= e(strtok(setting('about_text'), "\n")) ?></p>
-            <div class="socials socials-lg">
-                <?php foreach ($socials as $net => $link): ?>
-                    <a href="<?= e($link) ?>" target="_blank" rel="noopener" aria-label="<?= e($net) ?>"><?= icon($net, 18) ?></a>
-                <?php endforeach; ?>
+    <div class="container">
+        <section class="newsletter">
+            <div class="nl-company">
+                <img src="<?= asset('assets/img/logo-white.png') ?>" alt="<?= e($siteName) ?>" width="70" height="92" loading="lazy">
+                <b><?= e(setting('company_name', $siteName)) ?></b>
+                <?php if ($tax = setting('tax_number')): ?><small>رقم التسجيل الضريبي: <?= e($tax) ?></small><?php endif; ?>
+                <small><?= e(setting('address')) ?></small>
             </div>
-        </div>
-        <div>
-            <h4>روابط سريعة</h4>
-            <ul>
-                <li><a href="<?= url('/shop') ?>">كل المنتجات</a></li>
-                <li><a href="<?= url('/offers') ?>">العروض</a></li>
-                <li><a href="<?= url('/maintenance') ?>">طلب صيانة / تركيب</a></li>
-                <li><a href="<?= url('/track') ?>">تتبع طلبك</a></li>
-                <li><a href="<?= url('/faq') ?>">الأسئلة الشائعة</a></li>
-                <li><a href="<?= url('/about') ?>">من نحن</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4>الأقسام</h4>
-            <ul>
-                <?php foreach ($cats as $c): ?><li><a href="<?= url('/category/' . $c['slug']) ?>"><?= e($c['name']) ?></a></li><?php endforeach; ?>
-            </ul>
-        </div>
-        <div>
-            <h4>تواصل معنا</h4>
-            <ul class="contact-list">
-                <?php if ($phone): ?><li><?= icon('phone', 18) ?> <a href="<?= e(tel_link($phone)) ?>" dir="ltr"><?= e($phone) ?></a></li><?php endif; ?>
-                <?php if ($p2 = setting('phone2')): ?><li><?= icon('phone', 18) ?> <a href="<?= e(tel_link($p2)) ?>" dir="ltr"><?= e($p2) ?></a></li><?php endif; ?>
-                <li><?= icon('whatsapp', 18) ?> <a href="<?= e(wa_link()) ?>" target="_blank" rel="noopener">راسلنا على واتساب</a></li>
-                <?php if ($em = setting('email')): ?><li><?= icon('mail', 18) ?> <a href="mailto:<?= e($em) ?>"><?= e($em) ?></a></li><?php endif; ?>
-                <?php if ($ad = setting('address')): ?><li><?= icon('pin', 18) ?> <span><?= e($ad) ?></span></li><?php endif; ?>
-                <?php if ($wh = setting('working_hours')): ?><li><?= icon('clock', 18) ?> <span><?= e($wh) ?></span></li><?php endif; ?>
-            </ul>
+            <div class="nl-form">
+                <h3>انضم إلى مجتمع <?= e($siteName) ?></h3>
+                <p>اشترك في النشرة البريدية لتكون أول من يعلم عن العروض الحصرية وأحدث المنتجات ونصائح خبراء المياه.</p>
+                <form action="<?= url('/newsletter') ?>" method="post">
+                    <?= csrf_field() ?>
+                    <div class="nl-input">
+                        <input type="email" name="email" placeholder="أدخل بريدك الإلكتروني..." required aria-label="البريد الإلكتروني" dir="rtl">
+                        <button aria-label="اشتراك"><?= icon('chevron-l', 20) ?></button>
+                    </div>
+                    <label class="nl-agree"><input type="checkbox" name="agree" value="1" required> أوافق على <a href="<?= url('/page/privacy') ?>">سياسة الخصوصية</a> والشروط والأحكام.</label>
+                </form>
+            </div>
+            <div class="nl-app">
+                <b>كلمنا مباشرة</b>
+                <small>فريق المبيعات جاهز يرد على استفساراتك</small>
+                <div class="nl-btns">
+                    <a href="<?= e(wa_link('السلام عليكم، عايز أستفسر')) ?>" target="_blank" rel="noopener"><?= icon('whatsapp', 20) ?><span><small>راسلنا على</small>واتساب</span></a>
+                    <a href="<?= e(tel_link($phone)) ?>"><?= icon('phone', 20) ?><span><small>اتصل بنا</small><span dir="ltr"><?= e($phone) ?></span></span></a>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer-grid">
+            <div>
+                <h4><?= e($siteName) ?></h4>
+                <ul>
+                    <li><a href="<?= url('/') ?>">الرئيسية</a></li>
+                    <li><a href="<?= url('/about') ?>">من نحن</a></li>
+                    <li><a href="<?= url('/offers') ?>">تخفيضات</a></li>
+                    <li><a href="<?= url('/blog') ?>">المدونة والأخبار</a></li>
+                    <li><a href="<?= url('/brands') ?>">الماركات</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>المنتجات</h4>
+                <ul>
+                    <?php foreach ($cats as $c): if ($c['slug'] === 'offers') continue; ?><li><a href="<?= url('/category/' . $c['slug']) ?>"><?= e($c['name']) ?></a></li><?php endforeach; ?>
+                </ul>
+            </div>
+            <div>
+                <h4>الشراء من <?= e($siteName) ?></h4>
+                <ul>
+                    <li><a href="<?= url('/page/payment-methods') ?>">أنظمة السداد</a></li>
+                    <li><a href="<?= url('/page/how-to-buy') ?>">كيفية الشراء</a></li>
+                    <li><a href="<?= url('/page/returns') ?>">سياسة الإرجاع والاستبدال</a></li>
+                    <li><a href="<?= url('/page/shipping') ?>">سياسة الشحن والتركيب</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>حسابي</h4>
+                <ul>
+                    <li><a href="<?= url($me ? '/account?tab=profile' : '/account/login') ?>"><?= $me ? 'إعدادات الحساب' : 'تسجيل الدخول' ?></a></li>
+                    <li><a href="<?= url('/cart') ?>">عربة التسوق</a></li>
+                    <li><a href="<?= url('/account') ?>">طلباتي</a></li>
+                    <li><a href="<?= url('/wishlist') ?>">قائمة المفضلة</a></li>
+                    <li><a href="<?= url('/track') ?>">تتبع طلبك</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>خدمة العملاء</h4>
+                <ul>
+                    <li><a href="<?= url('/services') ?>">خدماتنا</a></li>
+                    <li><a href="<?= url('/service-request') ?>">طلب خدمة</a></li>
+                    <li><a href="<?= url('/installments') ?>">التقسيط</a></li>
+                    <li><a href="<?= url('/faq') ?>">الأسئلة الشائعة</a></li>
+                    <li><a href="<?= url('/contact') ?>">اتصل بنا</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>تواصل معنا</h4>
+                <ul class="contact-list">
+                    <?php if ($phone): ?><li><span class="ci"><?= icon('phone', 16) ?></span><a href="<?= e(tel_link($phone)) ?>" dir="ltr"><?= e($phone) ?></a></li><?php endif; ?>
+                    <?php if ($em = setting('email')): ?><li><span class="ci"><?= icon('mail', 16) ?></span><a href="mailto:<?= e($em) ?>"><?= e($em) ?></a></li><?php endif; ?>
+                    <?php if ($ad = setting('address')): ?><li><span class="ci"><?= icon('pin', 16) ?></span><span><?= e($ad) ?></span></li><?php endif; ?>
+                </ul>
+                <div class="socials">
+                    <?php foreach ($socials as $net => $link): ?>
+                        <a href="<?= e($link) ?>" target="_blank" rel="noopener" aria-label="<?= e($net) ?>"><?= icon($net, 20) ?></a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
     </div>
     <div class="footer-bottom">
         <div class="container">
-            <span>© <?= date('Y') ?> <?= e($siteName) ?> <?= e($tagline) ?> — جميع الحقوق محفوظة</span>
-            <span class="pay-methods"><?= icon('cash', 16) ?> الدفع عند الاستلام · فودافون كاش · إنستاباي</span>
+            <span>© <?= date('Y') ?> <?= e($siteName) ?>. جميع الحقوق محفوظة.</span>
+            <span class="fb-links"><a href="<?= url('/page/privacy') ?>">سياسة الخصوصية</a><i>|</i><a href="<?= url('/page/terms') ?>">الشروط والأحكام</a><i>|</i><a href="<?= url('/page/returns') ?>">الإرجاع والاستبدال</a></span>
+            <span class="pay-badges"><span>كاش</span><span>فودافون كاش</span><span>إنستاباي</span></span>
         </div>
     </div>
 </footer>
 
-<div class="floating">
-    <a href="<?= e(wa_link('السلام عليكم، عايز أستفسر عن الفلاتر')) ?>" class="fab fab-wa" target="_blank" rel="noopener" aria-label="واتساب"><?= icon('whatsapp', 28) ?></a>
-    <a href="<?= e(tel_link($phone)) ?>" class="fab fab-call" aria-label="اتصل بنا"><?= icon('phone', 24) ?></a>
-    <button class="fab fab-top" id="toTop" aria-label="لأعلى"><?= icon('arrow-up', 22) ?></button>
+<a href="<?= e(wa_link('السلام عليكم، عايز أستفسر عن الفلاتر')) ?>" class="wa-float" target="_blank" rel="noopener" aria-label="واتساب"><?= icon('whatsapp', 30) ?></a>
+<button class="to-top" id="toTop" aria-label="لأعلى"><?= icon('arrow-up', 20) ?></button>
+
+<nav class="bottom-nav" aria-label="تنقل سريع">
+    <a href="<?= url('/') ?>" class="<?= $isActive('/') ?>"><?= icon('home', 20) ?><span>الرئيسية</span></a>
+    <button type="button" data-open-drawer><?= icon('grid', 20) ?><span>التصنيفات</span></button>
+    <a href="<?= url($me ? '/account' : '/account/login') ?>" class="<?= $isActive('/account') ?>"><?= icon('user', 20) ?><span>حسابي</span></a>
+    <a href="<?= e(wa_link()) ?>" target="_blank" rel="noopener"><?= icon('whatsapp', 20) ?><span>واتساب</span></a>
+</nav>
+
+<!-- اختيار موقع التوصيل -->
+<div class="modal" id="location-modal" aria-hidden="true" role="dialog" aria-labelledby="loc-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-card">
+        <button class="icon-btn modal-x" data-close-modal aria-label="إغلاق"><?= icon('x', 20) ?></button>
+        <span class="modal-ico"><?= icon('pin', 28) ?></span>
+        <h3 id="loc-title">اختر موقع التوصيل</h3>
+        <p class="muted">علشان نوريك مدة التوصيل المتوقعة ونجهز بيانات الشحن.</p>
+        <form action="<?= url('/location') ?>" method="post" data-location-form>
+            <?= csrf_field() ?>
+            <select name="governorate" required aria-label="المحافظة">
+                <option value="">اختار المحافظة</option>
+                <?php foreach (governorates() as $g): ?><option <?= $loc === $g ? 'selected' : '' ?>><?= e($g) ?></option><?php endforeach; ?>
+            </select>
+            <button class="btn btn-primary btn-block">حفظ</button>
+        </form>
+    </div>
 </div>
+
+<?php if (setting('welcome_enabled', '1') === '1'): ?>
+<!-- رسالة الترحيب (أول زيارة بس) -->
+<div class="modal" id="welcome-modal" aria-hidden="true" role="dialog" aria-labelledby="wel-title" data-welcome>
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-card welcome-card">
+        <img src="<?= asset('assets/img/logo.png') ?>" alt="<?= e($siteName) ?>" width="110" height="144">
+        <h3 id="wel-title"><?= e(setting('welcome_title', 'مرحباً بكم في ' . $siteName)) ?></h3>
+        <div class="muted"><?= nl2p(setting('welcome_text')) ?></div>
+        <button class="btn btn-primary btn-lg" data-close-modal>استكشاف المتجر</button>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="toast-wrap" id="toasts" aria-live="polite"></div>
 
-<script>window.APP = { csrf: <?= json_encode(csrf_token()) ?>, cartUrl: <?= json_encode(url('/cart')) ?> };</script>
+<script>window.APP = { csrf: <?= json_encode(csrf_token()) ?>, cartUrl: <?= json_encode(url('/cart')) ?>, wishUrl: <?= json_encode(url('/wishlist/toggle')) ?> };</script>
 <script src="<?= asset('assets/js/site.js') ?>" defer></script>
 </body>
 </html>

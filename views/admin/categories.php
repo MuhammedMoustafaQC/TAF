@@ -7,7 +7,7 @@
                 <tbody>
                 <?php foreach ($categories as $c): ?>
                     <tr>
-                        <td><div class="prod-cell"><img src="<?= e(img($c['image'])) ?>" alt=""><div><b><?= e($c['name']) ?></b><small class="muted" dir="ltr">/category/<?= e($c['slug']) ?></small></div></div></td>
+                        <td><div class="prod-cell<?= $c['parent_id'] ? ' is-child' : '' ?>"><img src="<?= e(img($c['image'])) ?>" alt=""><div><b><?= $c['parent_id'] ? '<span class="muted">↳</span> ' : '' ?><?= e($c['name']) ?></b><small class="muted"><?= $c['parent_id'] ? 'فرعي من: ' . e($c['parent_name']) : 'قسم رئيسي' ?> · <span dir="ltr">/category/<?= e($c['slug']) ?></span></small></div></div></td>
                         <td><?= (int)$c['products_count'] ?></td>
                         <td><?= (int)$c['sort_order'] ?></td>
                         <td><?= $c['is_active'] ? '<span class="badge badge-success">ظاهر</span>' : '<span class="badge badge-muted">مخفي</span>' ?></td>
@@ -30,6 +30,15 @@
             <?= csrf_field() ?>
             <input type="hidden" name="id" value="<?= (int)($edit['id'] ?? 0) ?>">
             <label class="field"><span>اسم القسم *</span><input type="text" name="name" value="<?= e($edit['name'] ?? '') ?>" required class="<?= inv($errors, 'name') ?>"><?= err($errors, 'name') ?></label>
+            <label class="field"><span>القسم الرئيسي</span>
+                <select name="parent_id" class="<?= inv($errors, 'parent_id') ?>">
+                    <option value="">— قسم رئيسي —</option>
+                    <?php foreach ($parents as $pc): if ((int)$pc['id'] === (int)($edit['id'] ?? 0)) continue; ?>
+                        <option value="<?= (int)$pc['id'] ?>" <?= (int)($edit['parent_id'] ?? 0) === (int)$pc['id'] ? 'selected' : '' ?>><?= e($pc['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <?= err($errors, 'parent_id') ?>
+            </label>
             <label class="field"><span>الرابط (Slug)</span><input type="text" name="slug" value="<?= e($edit['slug'] ?? '') ?>" placeholder="تلقائي" dir="ltr"></label>
             <label class="field"><span>وصف</span><textarea name="description" rows="3"><?= e($edit['description'] ?? '') ?></textarea></label>
             <label class="field"><span>الترتيب</span><input type="number" name="sort_order" value="<?= (int)($edit['sort_order'] ?? 0) ?>"></label>

@@ -190,7 +190,7 @@ function tel_link(string $phone): string
 function nl2p(?string $text): string
 {
     $out = '';
-    foreach (preg_split('/\R+/', trim((string)$text)) as $line) {
+    foreach (preg_split('/\R+/u', trim((string)$text)) as $line) {
         if ($line !== '') $out .= '<p>' . e($line) . '</p>';
     }
     return $out;
@@ -199,7 +199,7 @@ function nl2p(?string $text): string
 function parse_specs(?string $specs): array
 {
     $out = [];
-    foreach (preg_split('/\R/', (string)$specs) as $line) {
+    foreach (preg_split('/\R/u', (string)$specs) as $line) {
         $line = trim($line);
         if ($line === '') continue;
         $parts = preg_split('/\s*:\s*/u', $line, 2);
@@ -433,7 +433,7 @@ function status_badge(string $status, array $map): string
 
 function valid_phone(string $phone): bool
 {
-    $p = preg_replace('/[\s\-]/', '', strtr($phone, ['٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9']));
+    $p = preg_replace('/[\s\-]/u', '', strtr($phone, ['٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9']));
     return (bool)preg_match('/^(\+?20)?0?1[0125]\d{8}$/', $p) || (bool)preg_match('/^0\d{8,10}$/', $p);
 }
 
@@ -493,6 +493,22 @@ function icon(string $name, int $size = 20, string $class = ''): string
         'quote'     => '<path d="M3 21c3 0 7-1 7-8V5H3v7h4c0 4-2 5-4 5zM14 21c3 0 7-1 7-8V5h-7v7h4c0 4-2 5-4 5z"/>',
         'award'     => '<circle cx="12" cy="8" r="6"/><path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1"/>',
         'filter'    => '<path d="M22 3H2l8 9.5V19l4 2v-8.5z"/>',
+        'user-plus' => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+        'heart'     => '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/>',
+        'book'      => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+        'telegram'  => '<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',
+        'messenger' => '<path d="M12 2C6.5 2 2 6.1 2 11.3c0 2.9 1.4 5.5 3.7 7.2V22l3.4-1.9c.9.3 1.9.4 2.9.4 5.5 0 10-4.1 10-9.2S17.5 2 12 2z"/><path d="m7 13 3-3 3 2 4-3-3 3-3-2z"/>',
+        'share'     => '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
+        'maximize'  => '<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>',
+        'lock'      => '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+        'rotate'    => '<path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/>',
+        'headset'   => '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/>',
+        'chat'      => '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3h.5a8.5 8.5 0 0 1 8 8z"/><path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01"/>',
+        'bolt'      => '<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+        'alert'     => '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+        'squares'   => '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
+        'arrow-l'   => '<path d="M19 12H5M12 19l-7-7 7-7"/>',
+        'certificate' => '<rect x="3" y="3" width="18" height="14" rx="2"/><path d="M7 8h10M7 12h6"/><circle cx="17" cy="16" r="3"/><path d="m15.5 18.5-1 3.5 2.5-1.2 2.5 1.2-1-3.5"/>',
         'printer'   => '<path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/>',
     ];
     $paths = $icons[$name] ?? $icons['drop'];
@@ -509,4 +525,106 @@ function err(array $errors, string $key): string
 function inv(array $errors, string $key): string
 {
     return isset($errors[$key]) ? ' is-invalid' : '';
+}
+
+/* ---------------- العملاء ---------------- */
+
+function customer(): ?array
+{
+    static $c = false;
+    if ($c !== false) return $c;
+    $id = $_SESSION['customer_id'] ?? null;
+    return $c = $id ? row('SELECT id, name, phone, email, governorate, city, address FROM customers WHERE id = ?', [$id]) : null;
+}
+
+function require_customer(): void
+{
+    if (!customer()) {
+        $_SESSION['customer_intended'] = $_SERVER['REQUEST_URI'] ?? null;
+        flash('error', 'سجّل دخولك الأول.');
+        redirect('/account/login');
+    }
+}
+
+/* ---------------- المفضلة ---------------- */
+
+/** أرقام المنتجات في المفضلة (للعميل المسجل من قاعدة البيانات، وللزائر من الجلسة) */
+function wishlist_ids(): array
+{
+    static $ids = null;
+    if ($ids !== null) return $ids;
+    if ($c = customer()) {
+        return $ids = array_map('intval', array_column(rows('SELECT product_id FROM wishlist WHERE customer_id = ?', [$c['id']]), 'product_id'));
+    }
+    return $ids = array_map('intval', $_SESSION['wishlist'] ?? []);
+}
+
+function in_wishlist(int $productId): bool
+{
+    return in_array($productId, wishlist_ids(), true);
+}
+
+/* ---------------- المنتج ---------------- */
+
+/** سطر الميزة اللي بيظهر في كارت المنتج (تقسيط / ضمان / ماركة) */
+function product_highlight(array $p): ?array
+{
+    $months = (int)($p['installment_months'] ?? 0);
+    if ($months > 0) return ['cash', 'قسط ' . number_format(ceil($p['price'] / $months)) . ' ج.م شهرياً'];
+    if (!empty($p['warranty'])) return ['shield', $p['warranty']];
+    if (!empty($p['brand_name'])) return ['award', 'ماركة معتمدة'];
+    return null;
+}
+
+function stars(float $rating, int $size = 14): string
+{
+    $out = '<span class="stars" aria-label="' . e(number_format($rating, 1)) . ' من 5">';
+    for ($i = 1; $i <= 5; $i++) {
+        $out .= '<span class="' . ($i <= round($rating) ? 'on' : '') . '">' . icon('star', $size) . '</span>';
+    }
+    return $out . '</span>';
+}
+
+/** تنسيق بسيط للمحتوى: سطر يبدأ بـ ## يبقى عنوان، وباقي السطور فقرات */
+function rich_text(?string $text): string
+{
+    $out = '';
+    foreach (preg_split('/\R/u', trim((string)$text)) as $line) {
+        $line = trim($line);
+        if ($line === '') continue;
+        if (str_starts_with($line, '## ')) $out .= '<h2>' . e(substr($line, 3)) . '</h2>';
+        elseif (str_starts_with($line, '### ')) $out .= '<h3>' . e(substr($line, 4)) . '</h3>';
+        elseif (preg_match('/^[-•]\s+(.*)$/u', $line, $m)) $out .= '<p class="li">' . e($m[1]) . '</p>';
+        else $out .= '<p>' . e($line) . '</p>';
+    }
+    return $out;
+}
+
+/** أسئلة المنتج: كل سؤال في سطر وتحته الإجابة، وبين كل سؤال والتاني سطر فاضي */
+function parse_faqs(?string $text): array
+{
+    $out = [];
+    foreach (preg_split('/\R\s*\R/u', trim((string)$text)) as $block) {
+        $lines = preg_split('/\R/u', trim($block));
+        if (!$lines || trim($lines[0]) === '') continue;
+        $out[] = [trim(array_shift($lines)), trim(implode("\n", $lines))];
+    }
+    return $out;
+}
+
+function installment_statuses(): array
+{
+    return [
+        'new'      => ['جديد', 'info'],
+        'review'   => ['قيد المراجعة', 'warning'],
+        'approved' => ['تمت الموافقة', 'success'],
+        'rejected' => ['مرفوض', 'danger'],
+    ];
+}
+
+/** الموقع (المحافظة) اللي العميل اختارها للتوصيل */
+function delivery_location(): string
+{
+    $g = $_COOKIE['delivery_gov'] ?? '';
+    return in_array($g, governorates(), true) ? $g : '';
 }

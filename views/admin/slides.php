@@ -6,7 +6,7 @@
             <div class="slide-item">
                 <div class="slide-thumb"><img src="<?= e(img($s['image'])) ?>" alt=""></div>
                 <div class="slide-info">
-                    <b><?= e($s['title']) ?></b>
+                    <b><?= $s['title'] !== '' && $s['title'] !== null ? e($s['title']) : '<span class="muted">شريحة صورة بدون نص</span>' ?></b>
                     <small class="muted"><?= e($s['subtitle']) ?></small>
                     <small><?= $s['is_active'] ? '<span class="badge badge-success">ظاهرة</span>' : '<span class="badge badge-muted">مخفية</span>' ?> · ترتيب <?= (int)$s['sort_order'] ?><?php if ($s['button_text']): ?> · زر: <?= e($s['button_text']) ?> <span dir="ltr">(<?= e($s['button_link']) ?>)</span><?php endif; ?></small>
                 </div>
@@ -27,7 +27,7 @@
         <form method="post" enctype="multipart/form-data" class="form">
             <?= csrf_field() ?>
             <input type="hidden" name="id" value="<?= (int)($edit['id'] ?? 0) ?>">
-            <label class="field"><span>العنوان *</span><input type="text" name="title" value="<?= e($edit['title'] ?? '') ?>" required class="<?= inv($errors, 'title') ?>"><?= err($errors, 'title') ?></label>
+            <label class="field"><span>العنوان <small class="muted">(اختياري — سيبه فاضي لو الصورة فيها الكلام)</small></span><input type="text" name="title" value="<?= e($edit['title'] ?? '') ?>" class="<?= inv($errors, 'title') ?>"><?= err($errors, 'title') ?></label>
             <label class="field"><span>النص</span><textarea name="subtitle" rows="3"><?= e($edit['subtitle'] ?? '') ?></textarea></label>
             <div class="form-grid">
                 <label class="field"><span>نص الزر</span><input type="text" name="button_text" value="<?= e($edit['button_text'] ?? '') ?>" placeholder="تسوق الآن"></label>

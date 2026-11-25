@@ -4,8 +4,15 @@
         <?php foreach ($groups as $group => $fields): ?>
         <section class="panel">
             <h2><?= e($group) ?></h2>
-            <?php foreach ($fields as $key => [$label, $type]): $v = $values[$key] ?? ''; ?>
-                <?php if ($type === 'checkbox'): ?>
+            <?php foreach ($fields as $key => $f): [$label, $type] = $f; $v = $values[$key] ?? ''; ?>
+                <?php if ($type === 'select'): ?>
+                    <label class="field"><span><?= e($label) ?></span>
+                        <select name="<?= e($key) ?>">
+                            <option value="">— بدون —</option>
+                            <?php foreach ($f[2] as $ov => $ol): ?><option value="<?= e($ov) ?>" <?= (string)$v === (string)$ov ? 'selected' : '' ?>><?= e($ol) ?></option><?php endforeach; ?>
+                        </select>
+                    </label>
+                <?php elseif ($type === 'checkbox'): ?>
                     <label class="check"><input type="checkbox" name="<?= e($key) ?>" value="1" <?= $v === '1' ? 'checked' : '' ?>> <?= e($label) ?></label>
                 <?php elseif ($type === 'textarea'): ?>
                     <label class="field"><span><?= e($label) ?></span><textarea name="<?= e($key) ?>" rows="4"><?= e($v) ?></textarea></label>

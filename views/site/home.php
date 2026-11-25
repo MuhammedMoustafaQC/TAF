@@ -1,227 +1,168 @@
-<?php
-$stages = [
-    ['شمعة الترسيب PP', 'بتشيل الرمل والصدأ والرواسب الكبيرة.'],
-    ['كربون حبيبي GAC', 'بيمتص الكلور والروائح والطعم غير المستحب.'],
-    ['كربون بلوك CTO', 'تنقية أدق للكلور والمواد العضوية.'],
-    ['ممبرين RO', 'قلب الفلتر — بيشيل لحد 99% من الأملاح والمعادن الثقيلة.'],
-    ['كربون نهائي T33', 'بيحسن طعم المياه بعد الخزان.'],
-    ['مرحلة المعادن', 'بتضيف معادن مفيدة للجسم.'],
-    ['ألكالاين / الأشعة', 'بتظبط الـ pH وبتقضي على البكتيريا.'],
-];
-?>
-
 <?php if ($slides): ?>
 <section class="hero" data-slider>
     <div class="hero-track">
-        <?php foreach ($slides as $i => $s): ?>
-        <div class="hero-slide<?= $i === 0 ? ' is-active' : '' ?>" data-slide>
+        <?php foreach ($slides as $i => $s): $hasText = trim((string)$s['title']) !== ''; ?>
+        <div class="hero-slide<?= $i === 0 ? ' is-active' : '' ?><?= $hasText ? '' : ' hero-img-only' ?>" data-slide>
+            <?php if ($hasText): ?>
             <div class="container hero-inner">
                 <div class="hero-text">
-                    <span class="hero-kicker"><?= icon('drop', 16) ?> <?= e(setting('site_name')) ?></span>
                     <h1><?= e($s['title']) ?></h1>
                     <?php if ($s['subtitle']): ?><p><?= e($s['subtitle']) ?></p><?php endif; ?>
-                    <div class="hero-btns">
-                        <?php if ($s['button_text']): ?><a href="<?= e(url($s['button_link'] ?: '/shop')) ?>" class="btn btn-white btn-lg"><?= e($s['button_text']) ?> <?= icon('chevron-l', 18) ?></a><?php endif; ?>
-                        <a href="<?= e(wa_link('السلام عليكم، عايز أستفسر')) ?>" class="btn btn-ghost btn-lg" target="_blank" rel="noopener"><?= icon('whatsapp', 20) ?> كلمنا واتساب</a>
-                    </div>
+                    <?php if ($s['button_text']): ?><a href="<?= e(url($s['button_link'] ?: '/shop')) ?>" class="hero-cta"><?= e($s['button_text']) ?></a><?php endif; ?>
                 </div>
-                <div class="hero-media">
-                    <?php if ($s['image']): ?><img src="<?= e(img($s['image'])) ?>" alt="" <?= $i ? 'loading="lazy"' : 'fetchpriority="high"' ?>><?php endif; ?>
-                </div>
+                <div class="hero-media"><?php if ($s['image']): ?><img src="<?= e(img($s['image'])) ?>" alt="" <?= $i ? 'loading="lazy"' : 'fetchpriority="high"' ?>><?php endif; ?></div>
             </div>
+            <?php else: ?>
+                <a href="<?= e(url($s['button_link'] ?: '/shop')) ?>"><img src="<?= e(img($s['image'])) ?>" alt="" class="hero-full"></a>
+            <?php endif; ?>
         </div>
         <?php endforeach; ?>
     </div>
     <?php if (count($slides) > 1): ?>
-    <button class="hero-arrow prev" data-prev aria-label="السابق"><?= icon('chevron-r', 24) ?></button>
-    <button class="hero-arrow next" data-next aria-label="التالي"><?= icon('chevron-l', 24) ?></button>
-    <div class="hero-dots">
-        <?php foreach ($slides as $i => $s): ?><button class="<?= $i === 0 ? 'is-active' : '' ?>" data-dot="<?= $i ?>" aria-label="شريحة <?= $i + 1 ?>"></button><?php endforeach; ?>
-    </div>
+        <button class="hero-arrow prev" data-prev aria-label="السابق"><?= icon('chevron-r', 24) ?></button>
+        <button class="hero-arrow next" data-next aria-label="التالي"><?= icon('chevron-l', 24) ?></button>
     <?php endif; ?>
-    <div class="hero-wave" aria-hidden="true"><svg viewBox="0 0 1440 70" preserveAspectRatio="none"><path d="M0 35c160 30 320 40 480 20S800 0 960 8s320 40 480 30v32H0z"/></svg></div>
 </section>
+<?php if (count($slides) > 1): ?>
+<div class="hero-dots" data-dots>
+    <?php foreach ($slides as $i => $s): ?><button class="<?= $i === 0 ? 'is-active' : '' ?>" data-dot="<?= $i ?>" aria-label="شريحة <?= $i + 1 ?>"></button><?php endforeach; ?>
+</div>
+<?php endif; ?>
 <?php endif; ?>
 
-<section class="section">
+<section class="section section-cats">
     <div class="container">
-        <div class="section-head">
-            <div><span class="eyebrow">تسوق حسب القسم</span><h2>أقسام المنتجات</h2></div>
-            <a href="<?= url('/shop') ?>" class="link-more">كل المنتجات <?= icon('chevron-l', 16) ?></a>
-        </div>
-        <div class="cat-grid">
-            <?php foreach ($categories as $c): ?>
-            <a href="<?= url('/category/' . $c['slug']) ?>" class="cat-card">
-                <span class="cat-img"><img src="<?= e(img($c['image'])) ?>" alt="" loading="lazy"></span>
-                <b><?= e($c['name']) ?></b>
-                <small><?= (int)$c['products_count'] ?> منتج</small>
-            </a>
-            <?php endforeach; ?>
+        <h2 class="sec-title only-mobile">أفضل التصنيفات</h2>
+        <div class="cat-strip">
+            <div class="carousel" data-carousel data-autoplay>
+                <button class="car-btn car-prev" data-car-prev aria-label="السابق"><?= icon('chevron-r', 22) ?></button>
+                <div class="car-track" data-car-track>
+                    <?php foreach (array_reverse($categories) as $c): ?>
+                    <a href="<?= url($c['slug'] === 'offers' ? '/offers' : '/category/' . $c['slug']) ?>" class="cat-circle">
+                        <span class="cc-img<?= $c['slug'] === 'offers' ? ' cc-sale' : '' ?>"><img src="<?= e(img($c['image'])) ?>" alt="" loading="lazy"></span>
+                        <b><?= e($c['name']) ?></b>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+                <button class="car-btn car-next" data-car-next aria-label="التالي"><?= icon('chevron-l', 22) ?></button>
+            </div>
         </div>
     </div>
 </section>
 
 <?php if ($featured): ?>
-<section class="section section-tint">
-    <div class="container">
-        <div class="section-head">
-            <div><span class="eyebrow">اختيارات عملائنا</span><h2>الأكثر مبيعاً</h2></div>
-            <a href="<?= url('/shop?sort=popular') ?>" class="link-more">شوف الكل <?= icon('chevron-l', 16) ?></a>
-        </div>
-        <div class="products-grid">
-            <?php foreach ($featured as $p) echo view('partials/product-card', ['p' => $p]); ?>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<section class="section">
-    <div class="container promo-grid">
-        <a href="<?= url('/maintenance') ?>" class="promo promo-indigo">
-            <div>
-                <span class="eyebrow eyebrow-light">خدمة مجانية</span>
-                <h3>تحليل مياه مجاني لبيتك</h3>
-                <p>اعرف نسبة الأملاح في مياهك واختار الفلتر المناسب مع فنيين متخصصين.</p>
-                <span class="btn btn-white btn-sm">احجز دلوقتي <?= icon('chevron-l', 16) ?></span>
-            </div>
-            <img src="<?= asset('assets/img/products/tds.svg') ?>" alt="" loading="lazy">
-        </a>
-        <a href="<?= url('/category/cartridges') ?>" class="promo promo-cyan">
-            <div>
-                <span class="eyebrow eyebrow-light">قطع غيار أصلية</span>
-                <h3>غيّر شمعاتك في معادها</h3>
-                <p>طقم الشمعات الأصلية بسعر مميز، مع التركيب في البيت.</p>
-                <span class="btn btn-white btn-sm">تسوق الشمعات <?= icon('chevron-l', 16) ?></span>
-            </div>
-            <img src="<?= asset('assets/img/products/cartridges-set.svg') ?>" alt="" loading="lazy">
-        </a>
-    </div>
-</section>
-
-<?php if ($offers): ?>
-<section class="section section-tint">
-    <div class="container">
-        <div class="section-head">
-            <div><span class="eyebrow">لفترة محدودة</span><h2>عروض وخصومات</h2></div>
-            <a href="<?= url('/offers') ?>" class="link-more">كل العروض <?= icon('chevron-l', 16) ?></a>
-        </div>
-        <div class="products-grid">
-            <?php foreach ($offers as $p) echo view('partials/product-card', ['p' => $p]); ?>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
-
-<section class="section stages">
-    <div class="container">
-        <div class="section-head center">
-            <div><span class="eyebrow">إزاي بننقي مياهك؟</span><h2>مراحل التنقية السبعة</h2>
-            <p class="lead">كل نقطة مياه بتعدي على 7 مراحل علشان توصلك نقية وصحية وطعمها حلو.</p></div>
-        </div>
-        <ol class="stages-list">
-            <?php foreach ($stages as $i => [$name, $text]): ?>
-            <li class="stage">
-                <span class="stage-num"><?= $i + 1 ?></span>
-                <b><?= e($name) ?></b>
-                <small><?= e($text) ?></small>
-            </li>
-            <?php endforeach; ?>
-        </ol>
-    </div>
-</section>
-
-<section class="section why">
-    <div class="container why-grid">
-        <div class="why-text">
-            <span class="eyebrow">ليه قطرات الندى؟</span>
-            <h2>خبرة في معالجة المياه تقدر تثق فيها</h2>
-            <p class="lead"><?= e(strtok(setting('about_text'), "\n")) ?></p>
-            <ul class="checks">
-                <li><?= icon('check', 18) ?> منتجات أصلية بضمان مكتوب</li>
-                <li><?= icon('check', 18) ?> تركيب مجاني بأيدي فنيين مدربين</li>
-                <li><?= icon('check', 18) ?> متابعة دورية وتذكير بمعاد تغيير الشمعات</li>
-                <li><?= icon('check', 18) ?> توصيل سريع لكل محافظات مصر</li>
-            </ul>
-            <a href="<?= url('/about') ?>" class="btn btn-primary">اعرف أكتر عننا</a>
-        </div>
-        <div class="stats">
-            <div class="stat"><b data-count="<?= (int)setting('stat_years', 10) ?>">+<?= (int)setting('stat_years', 10) ?></b><span>سنة خبرة</span></div>
-            <div class="stat"><b data-count="<?= (int)setting('stat_customers', 0) ?>">+<?= number_format((int)setting('stat_customers', 0)) ?></b><span>عميل سعيد</span></div>
-            <div class="stat"><b data-count="<?= (int)setting('stat_governorates', 27) ?>"><?= (int)setting('stat_governorates', 27) ?></b><span>محافظة بنوصلها</span></div>
-            <div class="stat"><b data-count="<?= (int)setting('stat_technicians', 0) ?>">+<?= (int)setting('stat_technicians', 0) ?></b><span>فني متخصص</span></div>
-        </div>
-    </div>
-</section>
-
-<?php if ($latest): ?>
 <section class="section">
     <div class="container">
-        <div class="section-head">
-            <div><span class="eyebrow">وصل حديثاً</span><h2>أحدث المنتجات</h2></div>
-            <a href="<?= url('/shop?sort=newest') ?>" class="link-more">شوف الكل <?= icon('chevron-l', 16) ?></a>
-        </div>
-        <div class="products-grid">
-            <?php foreach ($latest as $p) echo view('partials/product-card', ['p' => $p]); ?>
-        </div>
+        <?= view('partials/section-head', ['title' => 'منتجات مميزة', 'more' => '/shop?sort=popular']) ?>
+        <?= view('partials/product-carousel', ['products' => $featured]) ?>
     </div>
 </section>
 <?php endif; ?>
 
-<?php if ($testimonials): ?>
-<section class="section section-tint">
-    <div class="container">
-        <div class="section-head center">
-            <div><span class="eyebrow">آراء عملائنا</span><h2>بيقولوا إيه عننا؟</h2></div>
-        </div>
-        <div class="testimonials">
-            <?php foreach ($testimonials as $t): ?>
-            <figure class="testimonial card">
-                <span class="t-quote"><?= icon('quote', 26) ?></span>
-                <div class="stars" aria-label="<?= (int)$t['rating'] ?> من 5">
-                    <?php for ($i = 1; $i <= 5; $i++): ?><span class="<?= $i <= $t['rating'] ? 'on' : '' ?>"><?= icon('star', 16) ?></span><?php endfor; ?>
-                </div>
-                <blockquote><?= e($t['content']) ?></blockquote>
-                <figcaption><span class="avatar"><?= e(mb_substr($t['name'], 0, 1)) ?></span><span><b><?= e($t['name']) ?></b><?php if ($t['city']): ?><small><?= e($t['city']) ?></small><?php endif; ?></span></figcaption>
-            </figure>
-            <?php endforeach; ?>
-        </div>
+<?php foreach (banners('flash') as $b): ?><section class="bn-full"><?= view('partials/banner', ['b' => $b, 'variant' => 'flash']) ?></section><?php endforeach; ?>
+
+<?php if ($promo = banners('promo')): ?>
+<section class="section section-tight">
+    <div class="promo-row">
+        <?php foreach (array_slice($promo, 0, 3) as $b) echo view('partials/banner', ['b' => $b, 'variant' => 'promo']); ?>
     </div>
 </section>
 <?php endif; ?>
 
-<?php if ($faqs): ?>
+<?php if ($topSelling): ?>
 <section class="section">
-    <div class="container faq-wrap">
-        <div>
-            <span class="eyebrow">عندك سؤال؟</span>
-            <h2>الأسئلة الشائعة</h2>
-            <p class="lead">جمعنا أكتر الأسئلة اللي بتوصلنا. لو سؤالك مش موجود كلمنا على طول.</p>
-            <div class="faq-cta">
-                <a href="<?= e(wa_link('عندي سؤال عن الفلاتر')) ?>" class="btn btn-wa" target="_blank" rel="noopener"><?= icon('whatsapp', 18) ?> اسأل على واتساب</a>
-                <a href="<?= url('/faq') ?>" class="btn btn-outline">كل الأسئلة</a>
+    <div class="container">
+        <?= view('partials/section-head', ['title' => 'المنتجات الأكثر مبيعاً', 'more' => '/shop?sort=popular']) ?>
+        <?= view('partials/product-carousel', ['products' => $topSelling]) ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if ($newest): ?>
+<section class="section">
+    <div class="container">
+        <?= view('partials/section-head', ['title' => 'المنتجات الجديدة', 'more' => '/shop?sort=newest']) ?>
+        <?= view('partials/product-carousel', ['products' => $newest]) ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php foreach (banners('wide') as $b): ?><section class="bn-full"><?= view('partials/banner', ['b' => $b, 'variant' => 'wide']) ?></section><?php endforeach; ?>
+
+<?php if ($showcase && $showcaseSub): ?>
+<section class="section">
+    <div class="container">
+        <?= view('partials/section-head', ['title' => $showcase['name'], 'more' => '/category/' . $showcase['slug']]) ?>
+        <div class="carousel" data-carousel>
+            <button class="car-btn car-prev" data-car-prev aria-label="السابق"><?= icon('chevron-r', 22) ?></button>
+            <div class="car-track" data-car-track>
+                <?php foreach ($showcaseSub as $sc): ?>
+                <a href="<?= url('/category/' . $sc['slug']) ?>" class="sub-tile">
+                    <span class="st-ico"><?= icon('squares', 30) ?></span>
+                    <?php if ($sc['image']): ?><img src="<?= e(img($sc['image'])) ?>" alt="" loading="lazy"><?php endif; ?>
+                    <b><?= e($sc['name']) ?></b>
+                </a>
+                <?php endforeach; ?>
+            </div>
+            <button class="car-btn car-next" data-car-next aria-label="التالي"><?= icon('chevron-l', 22) ?></button>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php foreach (banners('brand') as $b): ?><section class="bn-full"><?= view('partials/banner', ['b' => $b, 'variant' => 'brand']) ?></section><?php endforeach; ?>
+
+<?php if ($brands): ?>
+<section class="section">
+    <div class="container">
+        <?= view('partials/section-head', ['title' => 'تسوق حسب الماركة', 'more' => '/brands']) ?>
+        <div class="carousel carousel-brands" data-carousel data-autoplay>
+            <div class="car-track" data-car-track>
+                <?php foreach ($brands as $br): ?>
+                <a href="<?= url('/brand/' . $br['slug']) ?>" class="brand-logo" title="<?= e($br['name']) ?>">
+                    <?php if ($br['logo']): ?><img src="<?= e(img($br['logo'])) ?>" alt="<?= e($br['name']) ?>" loading="lazy"><?php else: ?><span><?= e($br['name']) ?></span><?php endif; ?>
+                </a>
+                <?php endforeach; ?>
             </div>
         </div>
-        <div class="faq-list">
-            <?php foreach ($faqs as $i => $f): ?>
-            <details class="faq" <?= $i === 0 ? 'open' : '' ?>>
-                <summary><?= e($f['question']) ?> <?= icon('chevron-d', 18) ?></summary>
-                <div class="faq-a"><?= nl2p($f['answer']) ?></div>
-            </details>
-            <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if ($duo = banners('duo')): ?>
+<section class="section section-tight">
+    <div class="duo-row">
+        <?php foreach (array_slice($duo, 0, 2) as $b) echo view('partials/banner', ['b' => $b, 'variant' => 'duo']); ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if ($posts): ?>
+<section class="section">
+    <div class="container">
+        <?= view('partials/section-head', ['title' => 'أحدث المقالات والأخبار', 'more' => '/blog']) ?>
+        <div class="posts-grid">
+            <?php foreach ($posts as $post) echo view('partials/post-card', ['post' => $post]); ?>
         </div>
     </div>
 </section>
 <?php endif; ?>
 
-<section class="cta-band">
-    <div class="container cta-inner">
-        <div>
-            <h2>محتاج صيانة أو تغيير شمعات؟</h2>
-            <p>احجز زيارة فني في المعاد اللي يناسبك، وهنكلمك نأكد معاك.</p>
+<section class="section about-home">
+    <div class="container about-grid">
+        <div class="about-text">
+            <?php $at = setting('about_title', setting('site_name')); $parts = explode(' - ', $at, 2); ?>
+            <h2><?= e($parts[0]) ?><?php if (isset($parts[1])): ?> - <span><?= e($parts[1]) ?></span><?php endif; ?></h2>
+            <p><?= e(strtok(setting('about_text'), "\n")) ?> <a href="<?= url('/about') ?>" class="read-more">إقرأ المزيد...</a></p>
+            <div class="about-stats">
+                <div><b data-count="<?= (int)setting('stat_years', 10) ?>">+<?= (int)setting('stat_years', 10) ?></b><span>سنوات خبرة</span></div>
+                <div><b data-count="<?= (int)setting('stat_customers', 0) ?>">+<?= (int)setting('stat_customers', 0) ?></b><span>عميل راضٍ</span></div>
+                <div><b>24/7</b><span>دعم فني</span></div>
+            </div>
         </div>
-        <div class="cta-btns">
-            <a href="<?= url('/maintenance') ?>" class="btn btn-white btn-lg"><?= icon('tool', 20) ?> احجز صيانة</a>
-            <a href="<?= e(tel_link(setting('phone'))) ?>" class="btn btn-ghost btn-lg"><?= icon('phone', 20) ?> اتصل بينا</a>
+        <div class="about-media">
+            <div class="about-badge"><span><?= icon('shield', 24) ?></span><div><b>ضمان حقيقي 100%</b><small>على كافة المنتجات</small></div></div>
+            <div class="about-img"><img src="<?= asset('assets/img/products/ro-7.svg') ?>" alt="" loading="lazy"></div>
         </div>
     </div>
 </section>

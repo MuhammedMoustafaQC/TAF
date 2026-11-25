@@ -1,91 +1,92 @@
 <?php
 $cats = nav_categories();
-$base = $category ? '/category/' . $category['slug'] : (!empty($is_offers) ? '/offers' : ($filters['q'] !== '' ? '/search' : '/shop'));
+$selected = $filters['cat'];
+if (!empty($category)) $selected[] = $category['slug'];
 $qs = function (array $over) use ($filters) {
-    $q = array_filter(array_merge(['q' => $filters['q'], 'sort' => $filters['sort'], 'min' => $filters['min'], 'max' => $filters['max']], $over), fn($v) => $v !== '' && $v !== null);
+    $q = array_merge(['q' => $filters['q'], 'sort' => $filters['sort'], 'min' => $filters['min'], 'max' => $filters['max'], 'cat' => $filters['cat'], 'stock' => $filters['stock'] ? '1' : ''], $over);
+    $q = array_filter($q, fn($v) => $v !== '' && $v !== null && $v !== []);
     if (($q['sort'] ?? '') === 'popular') unset($q['sort']);
     if (($q['page'] ?? 1) == 1) unset($q['page']);
     return $q ? '?' . http_build_query($q) : '';
 };
+$total = (int)$result['total'];
 ?>
-<div class="page-hero">
-    <div class="container">
-        <nav class="breadcrumb"><a href="<?= url('/') ?>">الرئيسية</a> <span>/</span>
-            <?php if ($category || !empty($is_offers) || $filters['q'] !== ''): ?><a href="<?= url('/shop') ?>">المنتجات</a> <span>/</span><?php endif; ?>
-            <b><?= e($heading) ?></b>
-        </nav>
-        <h1><?= e($heading) ?></h1>
-        <?php if ($category && $category['description']): ?><p><?= e($category['description']) ?></p><?php endif; ?>
+<div class="container page-wrap">
+    <div class="crumbs crumbs-pill">
+        <a href="<?= url('/') ?>"><?= icon('home', 15) ?> الرئيسية</a> <?= icon('chevron-l', 14) ?>
+        <?php if (!empty($parent)): ?><a href="<?= url('/category/' . $parent['slug']) ?>"><?= e($parent['name']) ?></a> <?= icon('chevron-l', 14) ?><?php endif; ?>
+        <?php if (!empty($category) || !empty($brand) || !empty($is_offers) || $filters['q'] !== ''): ?><a href="<?= url('/shop') ?>">كل المنتجات</a> <?= icon('chevron-l', 14) ?><?php endif; ?>
+        <b><?= e($heading) ?></b>
     </div>
-</div>
 
-<section class="section section-tight">
-    <div class="container shop-layout">
-        <aside class="shop-side">
-            <details class="side-box" open>
-                <summary>الأقسام <?= icon('chevron-d', 18) ?></summary>
-                <ul class="side-cats">
-                    <li><a href="<?= url('/shop') ?>" class="<?= !$category && empty($is_offers) ? 'active' : '' ?>">كل المنتجات</a></li>
-                    <?php foreach ($cats as $c): ?>
-                        <li><a href="<?= url('/category/' . $c['slug']) ?>" class="<?= $category && $category['id'] == $c['id'] ? 'active' : '' ?>"><?= e($c['name']) ?> <small><?= (int)$c['products_count'] ?></small></a></li>
-                    <?php endforeach; ?>
-                    <li><a href="<?= url('/offers') ?>" class="<?= !empty($is_offers) ? 'active' : '' ?>">العروض والخصومات</a></li>
-                </ul>
-            </details>
-            <form class="side-box" method="get" action="<?= url($base) ?>">
+    <div class="shop-layout">
+        <aside class="shop-side" id="shop-filters">
+            <form method="get" action="<?= url($base) ?>" data-filter-form>
                 <?php if ($filters['q'] !== ''): ?><input type="hidden" name="q" value="<?= e($filters['q']) ?>"><?php endif; ?>
-                <input type="hidden" name="sort" value="<?= e($filters['sort']) ?>">
-                <div class="side-title">السعر (ج.م)</div>
-                <div class="price-range">
-                    <input type="number" name="min" min="0" placeholder="من" value="<?= e($filters['min']) ?>" inputmode="numeric">
-                    <span>—</span>
-                    <input type="number" name="max" min="0" placeholder="إلى" value="<?= e($filters['max']) ?>" inputmode="numeric">
+                <?php if ($filters['sort'] !== 'popular'): ?><input type="hidden" name="sort" value="<?= e($filters['sort']) ?>"><?php endif; ?>
+                <div class="fgroup">
+                    <label class="fcheck all"><input type="checkbox" data-filter-all <?= !$selected ? 'checked' : '' ?>> كل المنتجات</label>
                 </div>
-                <button class="btn btn-primary btn-sm btn-block"><?= icon('filter', 16) ?> تطبيق</button>
-                <?php if ($filters['min'] !== '' || $filters['max'] !== ''): ?>
-                    <a class="clear-link" href="<?= url($base) . e($qs(['min' => '', 'max' => ''])) ?>">مسح الفلتر</a>
-                <?php endif; ?>
+                <?php foreach ($cats as $c): if ($c['slug'] === 'offers') continue;
+                    $open = in_array($c['slug'], $selected, true) || array_intersect(array_column($c['children'], 'slug'), $selected); ?>
+                <details class="fgroup" <?= $open || count($cats) <= 6 ? 'open' : '' ?>>
+                    <summary><?= e($c['name']) ?> <?= icon('chevron-d', 16) ?></summary>
+                    <div class="fopts">
+                        <label class="fcheck"><input type="checkbox" name="cat[]" value="<?= e($c['slug']) ?>" <?= in_array($c['slug'], $selected, true) ? 'checked' : '' ?> data-autosubmit> كل منتجات <?= e($c['name']) ?></label>
+                        <?php foreach ($c['children'] as $ch): ?>
+                            <label class="fcheck child"><input type="checkbox" name="cat[]" value="<?= e($ch['slug']) ?>" <?= in_array($ch['slug'], $selected, true) ? 'checked' : '' ?> data-autosubmit> <?= e($ch['name']) ?></label>
+                        <?php endforeach; ?>
+                    </div>
+                </details>
+                <?php endforeach; ?>
+                <details class="fgroup" open>
+                    <summary>السعر (ج.م) <?= icon('chevron-d', 16) ?></summary>
+                    <div class="fopts">
+                        <div class="fprice">
+                            <input type="number" name="min" min="0" placeholder="من" value="<?= e($filters['min']) ?>" inputmode="numeric" aria-label="أقل سعر">
+                            <input type="number" name="max" min="0" placeholder="إلى" value="<?= e($filters['max']) ?>" inputmode="numeric" aria-label="أعلى سعر">
+                        </div>
+                        <label class="fcheck"><input type="checkbox" name="stock" value="1" <?= $filters['stock'] ? 'checked' : '' ?> data-autosubmit> المتوفر فقط</label>
+                        <button class="btn btn-primary btn-sm btn-block">تطبيق</button>
+                    </div>
+                </details>
             </form>
-            <a href="<?= url('/maintenance') ?>" class="side-promo">
-                <?= icon('tool', 28) ?>
-                <b>محتار تختار؟</b>
-                <span>احجز تحليل مياه مجاني والفني هيرشحلك الأنسب.</span>
-            </a>
         </aside>
 
         <div class="shop-main">
-            <div class="shop-bar">
-                <span><b><?= (int)$result['total'] ?></b> منتج</span>
-                <form method="get" action="<?= url($base) ?>" class="sort-form">
-                    <?php foreach (['q', 'min', 'max'] as $k): if ($filters[$k] !== ''): ?><input type="hidden" name="<?= $k ?>" value="<?= e($filters[$k]) ?>"><?php endif; endforeach; ?>
-                    <label for="sort">ترتيب حسب</label>
-                    <select name="sort" id="sort" data-autosubmit>
-                        <?php foreach (['popular' => 'الأكثر مبيعاً', 'newest' => 'الأحدث', 'price_asc' => 'السعر: من الأقل', 'price_desc' => 'السعر: من الأعلى'] as $k => $v): ?>
-                            <option value="<?= $k ?>" <?= $filters['sort'] === $k ? 'selected' : '' ?>><?= $v ?></option>
+            <div class="shop-top">
+                <h1><?= e($heading) ?> <small>(<?= $total ?> منتج)</small></h1>
+                <div class="sort-form">
+                    <button type="button" class="btn btn-light btn-sm filters-toggle" data-toggle-filters><?= icon('filter', 16) ?> فلترة</button>
+                    <label for="sort">ترتيب</label>
+                    <select id="sort" data-sort-select>
+                        <?php foreach (['popular' => 'الأكثر مبيعاً', 'newest' => 'الأحدث', 'price_asc' => 'السعر: من الأقل', 'price_desc' => 'السعر: من الأعلى', 'rating' => 'الأعلى تقييماً'] as $k => $v): ?>
+                            <option value="<?= e(url($base) . $qs(['sort' => $k, 'page' => 1])) ?>" <?= $filters['sort'] === $k ? 'selected' : '' ?>><?= $v ?></option>
                         <?php endforeach; ?>
                     </select>
-                </form>
+                </div>
             </div>
+            <?php if (!empty($description)): ?><p class="muted"><?= e($description) ?></p><?php endif; ?>
 
             <?php if ($result['items']): ?>
                 <div class="products-grid products-grid-3">
                     <?php foreach ($result['items'] as $p) echo view('partials/product-card', ['p' => $p]); ?>
                 </div>
                 <?php if ($result['pages'] > 1): ?>
-                <nav class="pagination">
+                <nav class="pagination" aria-label="الصفحات">
                     <?php for ($i = 1; $i <= $result['pages']; $i++): ?>
-                        <a href="<?= url($base) . e($qs(['page' => $i])) ?>" class="<?= $i === $result['page'] ? 'active' : '' ?>"><?= $i ?></a>
+                        <a href="<?= e(url($base) . $qs(['page' => $i])) ?>" class="<?= $i === $result['page'] ? 'active' : '' ?>"><?= $i ?></a>
                     <?php endfor; ?>
                 </nav>
                 <?php endif; ?>
             <?php else: ?>
-                <div class="empty">
-                    <?= icon('search', 48) ?>
+                <div class="card empty">
+                    <span class="empty-ico"><?= icon('search', 34) ?></span>
                     <h3>مفيش منتجات مطابقة</h3>
-                    <p>جرّب كلمة بحث تانية أو شيل فلتر السعر.</p>
+                    <p>جرّب كلمة بحث تانية أو غيّر الفلاتر.</p>
                     <a href="<?= url('/shop') ?>" class="btn btn-primary">كل المنتجات</a>
                 </div>
             <?php endif; ?>
         </div>
     </div>
-</section>
+</div>

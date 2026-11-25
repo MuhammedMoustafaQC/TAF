@@ -31,16 +31,17 @@ $fmtShort = fn($n) => $n >= 1000 ? rtrim(rtrim(number_format($n / 1000, 1), '0')
         <span class="kpi-ico kpi-warn"><?= icon('clock', 22) ?></span>
         <div><small>طلبات جديدة محتاجة تأكيد</small><b><?= number_format($stats['orders_new']) ?></b></div>
     </a>
-    <a href="<?= url('/admin/requests?status=new') ?>" class="kpi">
-        <span class="kpi-ico kpi-green"><?= icon('tool', 22) ?></span>
-        <div><small>طلبات صيانة جديدة</small><b><?= number_format($stats['requests_new']) ?></b></div>
+    <a href="<?= url('/admin/installments?status=new') ?>" class="kpi">
+        <span class="kpi-ico kpi-green"><?= icon('cash', 22) ?></span>
+        <div><small>طلبات تقسيط جديدة</small><b><?= number_format($stats['installments_new']) ?></b></div>
     </a>
 </div>
 
 <div class="mini-kpis">
-    <div><small>إجمالي الطلبات</small><b><?= number_format($stats['orders_total']) ?></b></div>
-    <div><small>إيرادات الطلبات المسلّمة</small><b><?= money($stats['revenue_total']) ?></b></div>
-    <a href="<?= url('/admin/products') ?>"><small>المنتجات</small><b><?= number_format($stats['products']) ?></b></a>
+    <a href="<?= url('/admin/orders') ?>"><small>إجمالي الطلبات</small><b><?= number_format($stats['orders_total']) ?></b></a>
+    <a href="<?= url('/admin/customers') ?>"><small>العملاء المسجلين</small><b><?= number_format($stats['customers']) ?></b></a>
+    <a href="<?= url('/admin/requests?status=new') ?>"><small>طلبات صيانة جديدة</small><b><?= number_format($stats['requests_new']) ?></b></a>
+    <a href="<?= url('/admin/reviews?status=pending') ?>"><small>تقييمات منتظرة الموافقة</small><b class="<?= $stats['reviews_pending'] ? 'text-warning' : '' ?>"><?= number_format($stats['reviews_pending']) ?></b></a>
     <a href="<?= url('/admin/products?status=low') ?>"><small>مخزون قليل (5 أو أقل)</small><b class="<?= $stats['low_stock'] ? 'text-danger' : '' ?>"><?= number_format($stats['low_stock']) ?></b></a>
     <a href="<?= url('/admin/messages') ?>"><small>رسائل غير مقروءة</small><b><?= number_format($stats['messages_new']) ?></b></a>
 </div>
@@ -146,6 +147,16 @@ $fmtShort = fn($n) => $n >= 1000 ? rtrim(rtrim(number_format($n / 1000, 1), '0')
                     <a href="<?= url('/admin/products/' . $p['id'] . '/edit') ?>"><?= e($p['name']) ?></a>
                     <span class="badge <?= $p['stock'] <= 0 ? 'badge-danger' : 'badge-warning' ?>"><?= (int)$p['stock'] ?> قطعة</span>
                 </li>
+                <?php endforeach; ?>
+            </ul>
+        </section>
+        <?php endif; ?>
+        <?php if ($installments): ?>
+        <section class="panel">
+            <div class="panel-head"><h2><?= icon('cash', 18) ?> طلبات تقسيط جديدة</h2><a href="<?= url('/admin/installments') ?>" class="link">الكل</a></div>
+            <ul class="list">
+                <?php foreach ($installments as $r): ?>
+                <li><span><b><?= e($r['name']) ?></b> — <?= e($r['product_name'] ?: 'بدون منتج محدد') ?><?php if ($r['months']): ?> · <?= (int)$r['months'] ?> شهور<?php endif; ?><br><small class="muted"><?= e($r['governorate']) ?> · <span dir="ltr"><?= e($r['phone']) ?></span></small></span></li>
                 <?php endforeach; ?>
             </ul>
         </section>
