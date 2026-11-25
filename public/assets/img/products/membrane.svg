@@ -5,7 +5,7 @@
 <linearGradient id="mbf" x1="0" x2="1"><stop offset="0" stop-color="#E6ECF5"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient>
 <clipPath id="mbc"><rect x="130" y="240" width="330" height="120" rx="10"/></clipPath>
 </defs>
-<circle cx="300" cy="300" r="250" fill="#EAF8FF"/>
+
 <ellipse cx="300" cy="470" rx="200" ry="16" fill="#1A1446" opacity=".12"/>
 <g transform="rotate(-18 300 300)">
 <rect x="130" y="240" width="330" height="120" rx="10" fill="url(#mbb)"/>

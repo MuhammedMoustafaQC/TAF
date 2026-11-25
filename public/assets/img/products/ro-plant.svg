@@ -5,7 +5,7 @@
 <linearGradient id="rpv2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#E6ECF5"/><stop offset="1" stop-color="#B8C3D6"/></linearGradient>
 <linearGradient id="rpm2" x1="0" x2="1"><stop offset="0" stop-color="#1A1446"/><stop offset=".45" stop-color="#3A1BD0"/><stop offset="1" stop-color="#14112E"/></linearGradient>
 </defs>
-<circle cx="300" cy="300" r="250" fill="#EAF8FF"/>
+
 <ellipse cx="300" cy="492" rx="230" ry="15" fill="#1A1446" opacity=".13"/>
 <g fill="url(#rpf)"><rect x="88" y="120" width="14" height="360"/><rect x="498" y="120" width="14" height="360"/><rect x="300" y="290" width="10" height="190" opacity="0"/></g>
 <g fill="url(#rph)"><rect x="88" y="116" width="424" height="12"/><rect x="88" y="290" width="424" height="10"/><rect x="88" y="466" width="424" height="12"/></g>

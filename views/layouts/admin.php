@@ -36,11 +36,11 @@ $active = fn($p) => $p === '/admin' ? $current === '/admin' : str_starts_with($c
     <link rel="icon" type="image/png" href="<?= asset('assets/img/favicon.png') ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('assets/css/admin.css') ?>">
 </head>
 <body class="admin">
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar" id="sidebar" aria-label="القائمة الجانبية">
     <a href="<?= url('/admin') ?>" class="side-brand">
         <img src="<?= asset('assets/img/logo-mark.png') ?>" alt="" width="34" height="52">
         <span><b><?= e(setting('site_name')) ?></b><small>لوحة التحكم</small></span>
@@ -50,8 +50,8 @@ $active = fn($p) => $p === '/admin' ? $current === '/admin' : str_starts_with($c
             <?php if ($href === '—'): ?>
                 <div class="side-sep"><?= e($label) ?></div>
             <?php else: ?>
-                <a href="<?= url($href) ?>" class="<?= $active($href) ? 'active' : '' ?>">
-                    <?= icon($ico, 19) ?> <span><?= e($label) ?></span>
+                <a href="<?= url($href) ?>" class="<?= $active($href) ? 'active' : '' ?>"<?= $active($href) ? ' aria-current="page"' : '' ?>>
+                    <?= icon($ico, 18) ?> <span><?= e($label) ?></span>
                     <?php if ($count): ?><em class="count"><?= (int)$count ?></em><?php endif; ?>
                 </a>
             <?php endif; ?>
@@ -65,8 +65,12 @@ $active = fn($p) => $p === '/admin' ? $current === '/admin' : str_starts_with($c
 
 <div class="main">
     <header class="topbar">
-        <button class="icon-btn menu-btn" data-side-open aria-label="القائمة"><?= icon('menu', 22) ?></button>
-        <h1><?= e($title ?? '') ?></h1>
+        <button class="icon-btn menu-btn" data-side-open aria-label="فتح القائمة"><?= icon('menu', 22) ?></button>
+        <div class="top-title">
+            <small><?= e(setting('site_name')) ?> · لوحة التحكم</small>
+            <h1><?= e($title ?? '') ?></h1>
+        </div>
+        <a href="<?= url('/') ?>" class="top-site hide-sm" target="_blank" rel="noopener"><?= icon('external', 15) ?> عرض الموقع</a>
         <div class="top-user">
             <span class="avatar"><?= e(mb_substr($me['name'] ?? 'م', 0, 1)) ?></span>
             <span class="hide-sm"><b><?= e($me['name'] ?? '') ?></b><small><?= e($me['username'] ?? '') ?></small></span>

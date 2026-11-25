@@ -5,7 +5,7 @@
 <linearGradient id="tds" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CFF3FF"/><stop offset="1" stop-color="#8FE0FF"/></linearGradient>
 <linearGradient id="tdc" x1="0" x2="1"><stop offset="0" stop-color="#8E99AD"/><stop offset=".4" stop-color="#F4F7FB"/><stop offset="1" stop-color="#7A869B"/></linearGradient>
 </defs>
-<circle cx="300" cy="300" r="250" fill="#EAF8FF"/>
+
 <ellipse cx="300" cy="500" rx="150" ry="14" fill="#1A1446" opacity=".13"/>
 <g transform="rotate(18 300 300)">
 <rect x="250" y="80" width="100" height="320" rx="34" fill="url(#tdw)" stroke="#C9D3E3"/>

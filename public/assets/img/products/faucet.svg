@@ -4,7 +4,7 @@
 <linearGradient id="fcb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F7FB"/><stop offset="1" stop-color="#8E99AD"/></linearGradient>
 <linearGradient id="fcw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#25C8FF" stop-opacity=".9"/><stop offset="1" stop-color="#25C8FF" stop-opacity=".25"/></linearGradient>
 </defs>
-<circle cx="300" cy="300" r="250" fill="#EAF8FF"/>
+
 <ellipse cx="290" cy="500" rx="130" ry="14" fill="#1A1446" opacity=".14"/>
 <path d="M250 200V170A90 90 0 0 1 430 170V214" fill="none" stroke="#6E7A90" stroke-width="34" stroke-linecap="round"/>
 <path d="M250 200V170A90 90 0 0 1 430 170V214" fill="none" stroke="#C3CBD8" stroke-width="24" stroke-linecap="round"/>

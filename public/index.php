@@ -25,6 +25,7 @@ $routes = [
     ['GET',      '/shop',                       'site_shop'],
     ['GET',      '/offers',                     'site_offers'],
     ['GET',      '/search',                     'site_shop'],
+    ['GET',      '/search/suggest',             'site_search_suggest'],
     ['GET',      '/category/{slug}',            'site_category'],
     ['GET',      '/brands',                     'site_brands'],
     ['GET',      '/brand/{slug}',               'site_brand'],

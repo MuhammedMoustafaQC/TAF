@@ -35,7 +35,7 @@ function seed(PDO $pdo): void
         'enable_wallet'          => '1',
         'installment_months'     => '4',
         'installment_note'       => 'قسّط مشترياتك على 4 شهور بنفس سعر الكاش',
-        'welcome_enabled'        => '1',
+        'welcome_enabled'        => '0',
         'welcome_title'          => 'مرحباً بكم في قطرات الندى',
         'welcome_text'           => "نسعد بزيارتكم لمتجرنا. بنلتزم بتوفير أجود أنواع فلاتر المياه وقطع الغيار الأصلية لصحة وسلامة عيلتكم.\nنتمنى لكم تجربة تسوق ممتعة.",
         'home_showcase_category' => 'cartridges',

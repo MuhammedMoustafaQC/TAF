@@ -5,7 +5,7 @@
 <linearGradient id="csg" x1="0" x2="1"><stop offset="0" stop-color="#C9D3E3"/><stop offset=".45" stop-color="#F4F7FB"/><stop offset="1" stop-color="#AEB9CC"/></linearGradient>
 <pattern id="csd" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1.4" fill="#5A5775"/></pattern>
 </defs>
-<circle cx="300" cy="300" r="250" fill="#EAF8FF"/>
+
 <ellipse cx="300" cy="478" rx="215" ry="16" fill="#1A1446" opacity=".12"/>
 <rect x="110" y="150" width="100" height="320" rx="10" fill="url(#csw)" stroke="#C9D3E3"/>
 <g stroke="#E1E7F0" stroke-width="3"><path d="M112 180H208M112 200H208M112 220H208M112 240H208M112 260H208M112 280H208M112 300H208M112 320H208M112 340H208M112 360H208M112 380H208M112 400H208M112 420H208M112 440H208"/></g>

@@ -628,3 +628,12 @@ function delivery_location(): string
     $g = $_COOKIE['delivery_gov'] ?? '';
     return in_array($g, governorates(), true) ? $g : '';
 }
+
+/** مدة التوصيل المتوقعة حسب المحافظة */
+function delivery_estimate(string $gov): string
+{
+    if ($gov === '') return 'من 1 إلى 4 أيام عمل';
+    if (in_array($gov, ['القاهرة', 'الجيزة', 'القليوبية'], true)) return 'خلال 24 ساعة';
+    if (in_array($gov, ['الإسكندرية', 'الشرقية', 'الدقهلية', 'الغربية', 'المنوفية', 'البحيرة', 'كفر الشيخ', 'دمياط', 'بورسعيد', 'الإسماعيلية', 'السويس', 'الفيوم', 'بني سويف'], true)) return 'خلال 1 إلى 2 يوم';
+    return 'خلال 2 إلى 4 أيام';
+}

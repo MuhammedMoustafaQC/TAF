@@ -5,7 +5,7 @@
 <linearGradient id="jbc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F7FB"/><stop offset=".5" stop-color="#AEB9CC"/><stop offset="1" stop-color="#7A869B"/></linearGradient>
 <linearGradient id="jbm" x1="0" x2="1"><stop offset="0" stop-color="#8E99AD"/><stop offset=".4" stop-color="#F4F7FB"/><stop offset="1" stop-color="#7A869B"/></linearGradient>
 </defs>
-<circle cx="300" cy="300" r="250" fill="#EAF8FF"/>
+
 <ellipse cx="300" cy="492" rx="130" ry="14" fill="#1A1446" opacity=".14"/>
 <rect x="70" y="138" width="460" height="22" fill="url(#jbc)"/>
 <rect x="110" y="132" width="22" height="34" rx="4" fill="url(#jbc)"/><rect x="468" y="132" width="22" height="34" rx="4" fill="url(#jbc)"/>

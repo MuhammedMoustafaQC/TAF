@@ -70,6 +70,10 @@ function site_home(): never
         'featured'    => rows(product_select() . ' WHERE p.is_active = 1 AND p.is_featured = 1 ORDER BY p.sales_count DESC LIMIT 12'),
         'topSelling'  => rows(product_select() . ' WHERE p.is_active = 1 ORDER BY p.sales_count DESC LIMIT 12'),
         'newest'      => rows(product_select() . ' WHERE p.is_active = 1 ORDER BY p.created_at DESC, p.id DESC LIMIT 12'),
+        'offers'      => rows(product_select() . ' WHERE p.is_active = 1 AND p.old_price > p.price ORDER BY (p.old_price - p.price) / p.old_price DESC LIMIT 12'),
+        'plants'      => rows(product_select() . " WHERE p.is_active = 1 AND c.slug = 'ro-plants' ORDER BY p.price LIMIT 2"),
+        // ترشيحات "اختار الفلتر المناسب" — لو منتج اتمسح بيتشال من الترشيحات تلقائياً
+        'finder'      => array_column(rows(product_select() . " WHERE p.is_active = 1 AND p.slug IN ('ro-7-taiwan','ro-7-pump','ro-5-classic','jumbo-20-triple','water-softener','ro-7-alkaline')"), null, 'slug'),
         'showcase'    => $showcase,
         'showcaseSub' => $showcase ? rows('SELECT * FROM categories WHERE parent_id = ? AND is_active = 1 ORDER BY sort_order, id', [$showcase['id']]) : [],
         'brands'      => nav_brands(),
@@ -174,6 +178,19 @@ function site_category(string $slug): never
         'result' => shop_query($f + ['category_ids' => [$cat['id']]]), 'base' => '/category/' . $cat['slug'],
         'description' => $cat['description'],
     ]);
+}
+
+/** اقتراحات البحث الفوري (JSON) */
+function site_search_suggest(): never
+{
+    $term = trim((string)input('q'));
+    $items = [];
+    if (mb_strlen($term) >= 2) {
+        foreach (rows(product_select() . ' WHERE p.is_active = 1 AND (p.name LIKE ? OR c.name LIKE ? OR b.name LIKE ?) ORDER BY p.stock > 0 DESC, p.sales_count DESC LIMIT 6', ["%$term%", "%$term%", "%$term%"]) as $p) {
+            $items[] = ['name' => $p['name'], 'url' => url('/product/' . $p['slug']), 'image' => img($p['image']), 'price' => money($p['price']), 'category' => $p['category_name']];
+        }
+    }
+    json_out(['ok' => true, 'items' => $items, 'all' => url('/search?q=' . urlencode($term))]);
 }
 
 function site_brands(): never
