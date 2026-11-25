@@ -1,0 +1,9 @@
+# لو الاستضافة بتخلي جذر الموقع هو الفولدر الرئيسي (public_html) — حوّل كل حاجة لفولدر public
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(app|views|storage)(/|$) - [F,L]
+    RewriteRule ^(\.git|README\.md|\.gitignore) - [F,L]
+    RewriteRule ^$ public/ [L]
+    RewriteCond %{REQUEST_URI} !/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

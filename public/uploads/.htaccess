@@ -1,0 +1,5 @@
+# منع تشغيل أي سكريبت داخل فولدر الصور المرفوعة
+Options -Indexes -ExecCGI
+<FilesMatch "\.(php\d?|phtml|phar|pl|py|cgi|sh)$">
+    Require all denied
+</FilesMatch>

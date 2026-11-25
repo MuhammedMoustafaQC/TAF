@@ -1,1 +1,14 @@
-/target/
+# قاعدة البيانات (بتتعمل تلقائياً أول تشغيل)
+/storage/*
+!/storage/.gitkeep
+!/storage/.htaccess
+
+# الصور اللي بتترفع من لوحة التحكم
+/public/uploads/*
+!/public/uploads/.gitkeep
+!/public/uploads/.htaccess
+
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

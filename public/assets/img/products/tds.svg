@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+<defs>
+<linearGradient id="tdw" x1="0" x2="1"><stop offset="0" stop-color="#DDE4EF"/><stop offset=".45" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C2CCDD"/></linearGradient>
+<linearGradient id="tdi" x1="0" x2="1"><stop offset="0" stop-color="#1A1446"/><stop offset=".45" stop-color="#3A1BD0"/><stop offset="1" stop-color="#14112E"/></linearGradient>
+<linearGradient id="tds" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CFF3FF"/><stop offset="1" stop-color="#8FE0FF"/></linearGradient>
+<linearGradient id="tdc" x1="0" x2="1"><stop offset="0" stop-color="#8E99AD"/><stop offset=".4" stop-color="#F4F7FB"/><stop offset="1" stop-color="#7A869B"/></linearGradient>
+</defs>
+<circle cx="300" cy="300" r="250" fill="#EAF8FF"/>
+<ellipse cx="300" cy="500" rx="150" ry="14" fill="#1A1446" opacity=".13"/>
+<g transform="rotate(18 300 300)">
+<rect x="250" y="80" width="100" height="320" rx="34" fill="url(#tdw)" stroke="#C9D3E3"/>
+<rect x="258" y="92" width="10" height="290" rx="5" fill="#FFFFFF" opacity=".9"/>
+<rect x="268" y="126" width="64" height="82" rx="10" fill="#1A1446"/>
+<rect x="276" y="134" width="48" height="66" rx="5" fill="url(#tds)"/>
+<rect x="276" y="134" width="48" height="10" rx="5" fill="#FFFFFF" opacity=".45"/>
+<rect x="278" y="232" width="44" height="22" rx="11" fill="#2B04B5"/>
+<rect x="278" y="266" width="44" height="22" rx="11" fill="#25C8FF"/>
+<rect x="250" y="320" width="100" height="80" rx="0" fill="url(#tdi)"/>
+<rect x="250" y="380" width="100" height="40" rx="20" fill="url(#tdi)"/>
+<rect x="250" y="316" width="100" height="8" fill="#25C8FF"/>
+<rect x="282" y="420" width="10" height="44" rx="4" fill="url(#tdc)"/>
+<rect x="308" y="420" width="10" height="44" rx="4" fill="url(#tdc)"/>
+<rect x="272" y="416" width="56" height="10" rx="4" fill="#1A1446"/>
+</g>
+<path d="M200 520c-0 0 0 0 0 0" fill="none"/>
+<g fill="#25C8FF"><path transform="translate(222 488) scale(1.5)" d="M0-14C5-6 9-1 9 4A9 9 0 0 1-9 4C-9-1-5-6 0-14Z"/><path transform="translate(160 200) scale(1.3)" d="M0-14C5-6 9-1 9 4A9 9 0 0 1-9 4C-9-1-5-6 0-14Z" opacity=".6"/><path transform="translate(460 220)" d="M0-14C5-6 9-1 9 4A9 9 0 0 1-9 4C-9-1-5-6 0-14Z" opacity=".5"/><path transform="translate(190 440)" d="M0-14C5-6 9-1 9 4A9 9 0 0 1-9 4C-9-1-5-6 0-14Z" opacity=".5"/></g>
+</svg>
